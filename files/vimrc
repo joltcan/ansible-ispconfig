@@ -1,0 +1,33 @@
+syntax on
+filetype on
+filetype plugin indent on
+
+if has("autocmd")
+    "autocmd BufRead,BufNewFile *.py set ai
+    "autocmd BufRead *.py set smartindent cinwords=if,elif,else,for,while,with,try,except,finally,def,class
+    au FileType python setl smarttab expandtab softtabstop=4 nowrap go+=b
+    au BufReadPost * if line("'\"") > 1 && line("'\"") <= line("$") | exe "normal! g'\"" | endif
+    "set completeopt=menuone,longest,preview
+endif
+
+" configure expanding of tabs for various file types
+" configure editor with tabs and nice stuff...
+set smarttab
+set tabstop=4
+set shiftwidth=4
+set smartindent
+
+" make backspaces more powerfull
+set backspace=indent,eol,start
+
+" lets get some line numbers in here!
+set showcmd                     " show (partial) command in status line
+
+"colorscheme solarized
+set background=light
+
+" movement
+map <c-j> <c-w>j
+map <c-k> <c-w>k
+map <c-l> <c-w>l
+map <c-h> <c-w>h

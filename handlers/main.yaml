@@ -1,5 +1,4 @@
 ---
-
 - name: restart postfix
   service: name=postfix state=restarted
 
@@ -11,3 +10,7 @@
 
 - name: restart pureftpd
   systemd: name=pure-ftpd-mysql state=restarted
+  
+- name: restart php-fpm
+  systemd: name=php{{ php_version }}-fpm state=restarted
+

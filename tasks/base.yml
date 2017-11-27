@@ -1,17 +1,5 @@
 ---
 
-- name: update apt cache
-  apt:
-    update_cache: yes
-
-- name: install keyrings pkgs
-  apt:
-    name={{ item }} state=present
-  with_items:
-    - 'debian-keyring'
-    - 'debian-archive-keyring'
-  register: keyrings
-
 - name: disable sources.list
   replace:
     dest: '/etc/apt/sources.list'
@@ -22,12 +10,14 @@
   apt_repository:
     repo={{ item }} state=present update_cache=yes
   with_items:
-    - 'deb http://ftp.de.debian.org/debian/  jessie main contrib non-free'
-    - 'deb-src http://ftp.de.debian.org/debian/ jessie main contrib non-free'
-    - 'deb http://security.debian.org/ jessie/updates main contrib non-free'
-    - 'deb-src http://security.debian.org/ jessie/updates main contrib non-free'
-    - 'deb http://ftp.de.debian.org/debian/ jessie-updates main contrib non-free'
-    - 'deb-src http://ftp.de.debian.org/debian/ jessie-updates main contrib non-free'
+    - 'deb http://httpredir.debian.org/debian/ stretch main contrib non-free'
+    - 'deb http://security.debian.org/ stretch/updates main contrib non-free'
+    - 'deb http://httpredir.debian.org/debian/ stretch-updates main contrib non-free'
+
+- name: update apt cache
+  apt:
+    cache_valid_time: 8600
+    update_cache: yes
 
 - name: dash config
   copy: >
@@ -49,15 +39,23 @@
   apt:
     name={{ item }} state=present
   with_items:
+    - binutils
+    - bup
+    - certbot
     - ntp
     - ntpdate
     - python-virtualenv
-    - mc
     - python-pip
+    - openvpn
     - rkhunter
-    - binutils
     - sudo
     - python-pexpect
+    - vim-nox
+    - iputils-ping
+    - traceroute
+    - pbzip2
+    - screen
+    - tmux
 
 - name: needed pip packages
   pip:

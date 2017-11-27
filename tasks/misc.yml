@@ -1,0 +1,104 @@
+---
+
+
+- name: install wp-cli
+  get_url:
+    url: https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar
+    dest: /usr/local/bin/wp
+    mode: 0755
+  tags:
+    - wpcli
+
+- name: Update sysctl for more connections
+  sysctl:
+    name: "{{ item.name }}"
+    value: "{{ item.value }}"
+    sysctl_file: /etc/sysctl.d/haproxy.conf
+    sysctl_set: yes
+  with_items:
+    - { name: 'net.ipv4.ip_local_port_range', value: '1000 65535' }
+
+- name: Higher ulimits for more sockets
+  pam_limits:
+    domain: "*"
+    limit_item: nofile
+    limit_type: '-' # both hard/soft
+    value: "{{ ulimit.nofile }}"
+
+- name: Set timezone
+  copy:
+    content: "Europe/Stockholm\n"
+    dest: /etc/timezone
+    owner: root
+    group: root
+    mode: 0444
+  notify: tzdata
+  tags:
+    - tz
+
+- name: Add server1 (openvpn) to hosts
+  lineinfile:
+    path: /etc/hosts
+    regexp: '^172.77.70.1'
+    line: '172.77.70.1    server01 server1 frrog1 frrog01'
+
+- name: Copy helpers
+  copy: 
+    src: "{{ item }}"
+    dest: "/usr/local/bin/{{ item }}"
+    mode: 0755
+  with_items:
+    - fix-ispconfig.sh
+    - backup_mysql.sh
+    - checkspace.sh
+  tags:
+    - cron
+
+- name: Add cronjobs
+  lineinfile:
+    path: /etc/crontab
+    line: "@daily   root    {{ item.job }}"
+    regexp: "{{ item.regexp }}"
+  with_items:
+    - {job: '/usr/local/bin/backup_mysql.sh', regexp: 'backup_mysql\.sh' }
+    - {job: '/usr/local/bin/fix-ispconfig.sh', regexp: 'fix-ispconfig\.sh' }
+    - {job: '/usr/local/bin/checkspace.sh', regexp: 'checkspace\.sh' }
+  tags:
+    - cron
+
+- name: Check if bup backup exists
+  stat:
+    path: /root/.bup/
+  register: bup
+  tags:
+    - bup
+
+- name: Init bup backup dir
+  shell: bup init
+  args:
+    chdir: /root
+  when: not bup.stat.isdir is defined
+  tags:
+    - bup
+
+- name: Copy vimrc
+  copy:
+    src: vimrc
+    dest: /root/.vimrc
+
+- name: Copy bashrc
+  copy:
+    src: bashrc
+    dest: /etc/profile.d/bashrc.sh
+
+- name: Change defaults for inputrc
+  lineinfile:
+    path: /etc/inputrc
+    regexp: "{{ item.reg }}"
+    line: "{{ item.line }}"
+    insertbefore: "# some defaults"
+  with_items:
+    - {line: "set bell-style none", reg: '^# set bell-style none' }
+    - {line: "set completion-ignore-case on", reg: 'set completion-ignore-case on'}
+  tags:
+    - inputrc

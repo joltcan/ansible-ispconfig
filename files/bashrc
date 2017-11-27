@@ -1,0 +1,8 @@
+if [ -f /usr/bin/apt-get ]; then alias upgrade='sudo apt-get update && sudo apt-get -y upgrade && sudo apt-get clean' ; fi
+if [ -f /usr/bin/vim ]; then alias vi='vim' ; fi
+if [ -f /etc/bash_completion ]; then source /etc/bash_completion ; fi
+
+alias rsv='rsync -avP'
+alias l='ls -lah'
+export EDITOR=vim
+export PS1="\[\e]0;\u@\h: \w\a\]${debian_chroot:+($debian_chroot)}\u@\h:\w\\$ "

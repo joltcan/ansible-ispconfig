@@ -1,19 +1,24 @@
-mysql_root_password: replaceme!
-server_hostname: "{{ ansible_hostname }}"
+mysql_root_password: '{{ ispconfig.ansible_hostname.mysql_root_password }}'
+server_hostname: '{{ ansible_hostname }}'
+php_version: 7.0
+
+ulimit:
+  nofile: 1000000
+
 ftpd_openssl_config:
   days: 7300
   size: 2048
-  country: US
+  country: SE
   state: na
-  locality: Earth
-  org: Weyland-Yutani
-  unit: xenomorph research
-  common: building better words
-  email: dontwrite@me.com
+  locality: Malmö
+  org: FrRog Ek
+  unit: SSL
+  common: SSL
+  email: tech@frrog.com
 
 mailman_list:
-  email: dontwrite@me.common
-  password: ch@ngeme!
+  email: tech@frrog.com
+  password: '{{ ispconfig.ansible_hostname.mailman_password }}'
 
 mailman_aliases: |
   ## mailman mailing list

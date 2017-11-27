@@ -4,46 +4,38 @@
    name={{ item }}
   with_items:
     - apache2
-    - apache2.2-common
-    - apache2-doc
-    - apache2-mpm-prefork
     - apache2-utils
-    - libexpat1
-    - ssl-cert
-    - libapache2-mod-php5
-    - php5
-    - php5-common
-    - php5-gd
-    - php5-mysql
-    - php5-imap
-    - phpmyadmin
-    - php5-cli
-    - php5-cgi
-    - libapache2-mod-fcgid
-    - apache2-suexec
-    - php-pear
-    - php-auth
-    - php5-mcrypt
-    - mcrypt
-    - php5-imagick
+    - apache2-suexec-pristine
     - imagemagick
-    - libruby
-    - libapache2-mod-python
-    - php5-curl
-    - php5-intl
-    - php5-memcache
-    - php5-memcached
-    - php5-pspell
-    - php5-recode
-    - php5-sqlite
-    - php5-tidy
-    - php5-xmlrpc
-    - php5-xsl
-    - php5-xcache
-    - memcached
+    - libexpat1
+    - libapache2-mod-php7.0
     - libapache2-mod-passenger
-    - php5-fpm
-    - libapache2-mod-fastcgi
+    - libapache2-mod-fcgid
+    - mcrypt
+    - memcached
+    - ssl-cert
+    - php-pear
+    - phpmyadmin
+    - php-memcache
+    - php-memcached
+    - php7.0-cli
+    - php7.0-cgi
+    - php7.0-common
+    - php7.0-curl
+    - php7.0-fpm
+    - php7.0-gd
+    - php7.0-imagick
+    - php7.0-imap
+    - php7.0-intl
+    - php7.0-mcrypt
+    - php7.0-mysql
+    - php7.0-opcache
+    - php7.0-pspell
+    - php7.0-recode
+    - php7.0-sqlite3
+    - php7.0-tidy
+    - php7.0-xmlrpc
+    - php7.0-xsl
   tags:
     - install-webserver
 
@@ -68,11 +60,39 @@
     - ssl
     - actions
     - include
-    - dav_fs
-    - dav
     - auth_digest
     - cgi
     - alias
-    - fastcgi
   notify:
     - restart apache
+
+- name: Update php.ini
+  ini_file:
+    dest: "/etc/php/{{ php_version }}/{{ item.dest }}"
+    section: "{{ item.section }}"
+    option: "{{ item.option }}"
+    value: "{{ item.value }}"
+  with_items:
+    - { section: Date, option: date.timezone, value: Europe/Berlin, dest: fpm/php.ini }
+    - { section: Date, option: date.timezone, value: Europe/Berlin, dest: cli/php.ini }
+    - { section: PHP, option: error_log, value: syslog, dest: fpm/php.ini }
+    - { section: PHP, option: error_log, value: syslog, dest: cli/php.ini }
+    - { section: PHP, option: error_reporting, value: 'E_ALL & ~E_DEPRECATED & ~E_STRICT & ~E_DEPRECATED', dest: cli/php.ini }
+    - { section: PHP, option: error_reporting, value: 'E_ALL & ~E_DEPRECATED & ~E_STRICT & ~E_DEPRECATED', dest: fpm/php.ini }
+    - { section: global, option: syslog.facility, value: user, dest: fpm/php-fpm.conf }
+    - { section: global, option: error_log, value: syslog, dest: fpm/php-fpm.conf }
+    - { section: global, option: log_level, value: warning, dest: fpm/php-fpm.conf }
+    - { section: PHP, option: upload_max_filesize, value: 60M, dest: fpm/php.ini }
+    - { section: PHP, option: post_max_size, value: 65M, dest: fpm/php.ini }
+  notify: restart php-fpm
+  tags:
+    - init
+    - php
+
+- name: Change serverversion in Apache
+  lineinfile:
+    path: /etc/apache2/conf-enabled/security.conf
+    regexp: "^ServerTokens OS"
+    line: "ServerTokens Minimal"
+  tags:
+    - apacheconf

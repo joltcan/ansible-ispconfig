@@ -1,0 +1,22 @@
+- name: Check if we have the iptables default file
+  stat:
+    path: /etc/network/ip4tables
+  register: ipt
+
+- name: Install iptables default conf file
+  copy:
+    src: ip4tables
+    dest: /etc/network/ip4tables
+    owner: root
+    group: root
+    force: no # dont overwrite
+  notify: apply iptables
+  when: not ipt.stat.exists
+
+- name: Add iptables-restore to if-up.d
+  copy:
+    dest: /etc/network/if-up.d/iptables-restore
+    content: "#!/bin/bash\niptables-restore < /etc/network/ip4tables\n"
+    mode: 0755
+  notify: apply iptables
+
