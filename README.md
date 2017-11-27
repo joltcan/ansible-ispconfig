@@ -8,7 +8,7 @@ Usage:
 ------
 As usual, add this to a playbook:
 
-'''
+```
 ---
 
 - hosts: A group of hosts
@@ -19,7 +19,7 @@ As usual, add this to a playbook:
 
   roles:
      - ispconfig
-'''
+```
 
 Requirements
 ------------
