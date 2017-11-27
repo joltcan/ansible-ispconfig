@@ -20,6 +20,17 @@ As usual, add this to a playbook:
   roles:
      - ispconfig
 ```
+My vars-file looks like this:
+```
+---
+  ispconfig:
+    email: <an email>
+    <ansible_hostname>:
+      mysql_root_password: <passwd>
+      mailmain_password: <passwd>
+    <other ansible_hostname>:
+      mysql...
+```
 
 Requirements
 ------------
