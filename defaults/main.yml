@@ -14,10 +14,10 @@ ftpd_openssl_config:
   org: FrRog Ek
   unit: SSL
   common: SSL
-  email: tech@frrog.com
+  email: '{{ ispconfig.email }}'
 
 mailman_list:
-  email: tech@frrog.com
+  email: '{{ ispconfig.email }}'
   password: '{{ ispconfig.ansible_hostname.mailman_password }}'
 
 mailman_aliases: |
