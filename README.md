@@ -4,29 +4,26 @@ This role prepare environment for ISPConfig 3 based on [ISPConfig guide](https:/
 
 Role **is not tested** on production environment.
 
-
 Usage:
 ------
-As usual:
+As usual, add this to a playbook:
 
-    roles:
-			- { ansible-ispconfig, mysql_root_password: 'password' }
-    
+'''
+---
 
+- hosts: A group of hosts
+  # I source my variables from a config file instead of setting them in the playbook
+  # so that I can have different passwords for different servers
+  vars_files:
+    - ../private/ispconfig.yml
 
-What's not covered (for now)
-------
-* support for nginx
-* ~~ftp quotas and ftps~~
-* ~~Mailman setup~~
-* Jailkit setup
-* webmail setup
-
+  roles:
+     - ispconfig
+'''
 
 Requirements
 ------------
-Debian Jessie
-
+Debian Stretch
 
 License
 -------
