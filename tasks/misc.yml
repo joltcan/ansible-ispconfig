@@ -90,15 +90,23 @@
   copy:
     src: bashrc
     dest: /etc/profile.d/bashrc.sh
-
+    
+- name: Remove old defaults from inputrc
+  lineinfile:
+    path: /etc/inputrc
+    regexp: "^# set bell-style none"
+    state: absent
+  tags:
+    - inputrc
+    
 - name: Change defaults for inputrc
   lineinfile:
     path: /etc/inputrc
-    regexp: "{{ item.reg }}"
+    regexp: "{{ item.line }}"
     line: "{{ item.line }}"
-    insertbefore: "# some defaults"
+    insertafter: "# set bell-style visible"
   with_items:
-    - {line: "set bell-style none", reg: '^# set bell-style none' }
-    - {line: "set completion-ignore-case on", reg: 'set completion-ignore-case on'}
+    - {line: "set completion-ignore-case on"}
+    - {line: "set bell-style none"}
   tags:
     - inputrc
